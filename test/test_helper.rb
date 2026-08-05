@@ -20,5 +20,15 @@ module ActiveSupport
     def dummy_root
       File.expand_path("#{__dir__}/dummy")
     end
+
+    # Waits until the Rails add-on finished booting the runner client and fails the test immediately if it fell back
+    # to a NullClient, instead of hanging forever waiting for a real client that will never arrive
+    def wait_for_rails_runner_client_boot
+      addon = RubyLsp::Addon.addons.first #: as RubyLsp::Rails::Addon
+      addon.join_boot_thread
+
+      client = addon.rails_runner_client
+      refute_instance_of(RubyLsp::Rails::NullClient, client, "Expected the Rails runner client to boot successfully")
+    end
   end
 end

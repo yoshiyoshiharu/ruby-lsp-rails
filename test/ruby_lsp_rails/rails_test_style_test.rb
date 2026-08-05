@@ -142,7 +142,7 @@ module RubyLsp
         Dir.stubs(:glob).returns(test_paths)
 
         with_server do |server|
-          sleep(0.1) while RubyLsp::Addon.addons.first.instance_variable_get(:@rails_runner_client).is_a?(NullClient)
+          wait_for_rails_runner_client_boot
 
           server.process_message({
             id: 1,
@@ -181,7 +181,7 @@ module RubyLsp
 
       test "resolve test command group test" do
         with_server do |server|
-          sleep(0.1) while RubyLsp::Addon.addons.first.instance_variable_get(:@rails_runner_client).is_a?(NullClient)
+          wait_for_rails_runner_client_boot
 
           server.process_message({
             id: 1,
@@ -230,7 +230,7 @@ module RubyLsp
 
       test "resolve test escapes file paths in groups" do
         with_server do |server|
-          sleep(0.1) while RubyLsp::Addon.addons.first.instance_variable_get(:@rails_runner_client).is_a?(NullClient)
+          wait_for_rails_runner_client_boot
 
           server.process_message({
             id: 1,
@@ -264,7 +264,7 @@ module RubyLsp
 
       test "resolve test escapes single file paths" do
         with_server do |server|
-          sleep(0.1) while RubyLsp::Addon.addons.first.instance_variable_get(:@rails_runner_client).is_a?(NullClient)
+          wait_for_rails_runner_client_boot
 
           server.process_message({
             id: 1,
@@ -298,7 +298,7 @@ module RubyLsp
         Dir.stubs(:glob).returns([test_path])
 
         with_server do |server|
-          sleep(0.1) while RubyLsp::Addon.addons.first.instance_variable_get(:@rails_runner_client).is_a?(NullClient)
+          wait_for_rails_runner_client_boot
 
           server.process_message({
             id: 1,
@@ -328,7 +328,7 @@ module RubyLsp
 
       test "resolve test escapes file paths for specific examples" do
         with_server do |server|
-          sleep(0.1) while RubyLsp::Addon.addons.first.instance_variable_get(:@rails_runner_client).is_a?(NullClient)
+          wait_for_rails_runner_client_boot
 
           server.process_message({
             id: 1,
