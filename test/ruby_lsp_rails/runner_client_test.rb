@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require "test_helper"
+require "tmpdir"
 require "ruby_lsp/ruby_lsp_rails/runner_client"
 
 module RubyLsp
@@ -101,10 +102,28 @@ module RubyLsp
           log = pop_log_notification(outgoing_queue, RubyLsp::Constant::MessageType::WARNING)
 
           assert_instance_of(RubyLsp::Notification, log)
-          assert_match("Ruby LSP Rails failed to locate bin/rails in the current directory", log.params.message)
+          assert_match("Ruby LSP Rails failed to locate bin/rails in the workspace", log.params.message)
         ensure
           outgoing_queue.close
           FileUtils.mv("bin/rails_backup", "bin/rails")
+        end
+      end
+
+      test "creates a client when the current working directory is not the workspace" do
+        outgoing_queue = Thread::Queue.new
+
+        client = Dir.mktmpdir do |dir|
+          Dir.chdir(dir) { RunnerClient.create_client(outgoing_queue, @global_state) }
+        end
+
+        begin
+          refute_instance_of(NullClient, client)
+
+          response = client.model("User") #: as !nil
+          assert(response.key?(:columns))
+        ensure
+          client.shutdown
+          outgoing_queue.close
         end
       end
 

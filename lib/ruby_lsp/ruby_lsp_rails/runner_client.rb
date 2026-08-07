@@ -10,13 +10,15 @@ module RubyLsp
       class << self
         #: (Thread::Queue outgoing_queue, RubyLsp::GlobalState global_state) -> RunnerClient
         def create_client(outgoing_queue, global_state)
-          if File.exist?("bin/rails")
+          workspace_path = global_state.workspace_path
+
+          if File.exist?(File.join(workspace_path, "bin", "rails"))
             new(outgoing_queue, global_state)
           else
             unless outgoing_queue.closed?
               outgoing_queue << RubyLsp::Notification.window_log_message(
                 <<~MESSAGE.chomp,
-                  Ruby LSP Rails failed to locate bin/rails in the current directory: #{Dir.pwd}
+                  Ruby LSP Rails failed to locate bin/rails in the workspace: #{workspace_path}
                   Server dependent features will not be available
                 MESSAGE
                 type: RubyLsp::Constant::MessageType::WARNING,
@@ -64,6 +66,7 @@ module RubyLsp
             "#{__dir__}/server.rb",
             "start",
             server_relevant_capabilities(global_state),
+            { chdir: global_state.workspace_path },
           )
         end
 

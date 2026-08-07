@@ -58,6 +58,13 @@ module RubyLsp
         @addon_mutex.synchronize { @rails_runner_client }
       end
 
+      # Blocks until the add-on finished booting the Rails runner client, successfully or not. After this method
+      # returns, `rails_runner_client` is in its final state: a working client or a NullClient if booting failed
+      #: -> void
+      def join_boot_thread
+        @boot_thread.join
+      end
+
       # @override
       #: (GlobalState global_state, Thread::Queue outgoing_queue) -> void
       def activate(global_state, outgoing_queue)
@@ -77,7 +84,7 @@ module RubyLsp
       # @override
       #: -> void
       def deactivate
-        @boot_thread.join
+        join_boot_thread
         @rails_runner_client.shutdown
       end
 
